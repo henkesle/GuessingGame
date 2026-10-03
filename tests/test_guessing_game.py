@@ -1,5 +1,5 @@
 import unittest
-from src.guessing_game import is_valid_target
+from src.guessing_game import is_valid_target, generate_target
 
 
 class TestGuessingGame(unittest.TestCase):
@@ -34,6 +34,28 @@ class TestGuessingGame(unittest.TestCase):
         self.assertFalse(is_valid_target(3.5))
         self.assertFalse(is_valid_target("5"))
         self.assertFalse(is_valid_target(None))
+
+    def test_generate_target_returns_integer(self):
+        """Test that generate_target returns an integer."""
+        target = generate_target()
+        self.assertIsInstance(target, int)
+
+    def test_generate_target_is_valid(self):
+        """Test that generate_target returns a valid target using is_valid_target."""
+        target = generate_target()
+        self.assertTrue(is_valid_target(target))
+
+    def test_generate_target_multiple_calls(self):
+        """Test that generate_target produces valid targets across multiple calls."""
+        targets = [generate_target() for _ in range(10)]
+        for target in targets:
+            self.assertTrue(is_valid_target(target), f"Generated invalid target: {target}")
+
+    def test_generate_target_range(self):
+        """Test that generate_target produces values within the expected range."""
+        target = generate_target()
+        self.assertGreaterEqual(target, 1)
+        self.assertLessEqual(target, 999)
 
 
 if __name__ == '__main__':

@@ -1,3 +1,6 @@
+import random
+
+
 def is_valid_target(value):
     """Check if a value is a valid game target (odd integer between 1 and 1000)."""
     # Check if value is an integer
@@ -13,3 +16,10 @@ def is_valid_target(value):
         return False
     
     return True
+
+
+def generate_target():
+    """Generate a random valid target (odd integer between 1 and 999)."""
+    # Generate a random number from 0 to 499 (500 possible odd numbers)
+    # Multiply by 2 and add 1 to get odd numbers from 1 to 999
+    return random.randint(0, 499) * 2 + 1
