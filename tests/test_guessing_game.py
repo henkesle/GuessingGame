@@ -1,5 +1,5 @@
 import unittest
-from src.guessing_game import is_valid_target, generate_target
+from src.guessing_game import is_valid_target, generate_target, is_valid_guess
 
 
 class TestGuessingGame(unittest.TestCase):
@@ -56,6 +56,37 @@ class TestGuessingGame(unittest.TestCase):
         target = generate_target()
         self.assertGreaterEqual(target, 1)
         self.assertLessEqual(target, 999)
+
+    def test_valid_odd_guesses(self):
+        """Test that valid odd guesses are accepted."""
+        self.assertTrue(is_valid_guess(1))
+        self.assertTrue(is_valid_guess(3))
+        self.assertTrue(is_valid_guess(501))
+        self.assertTrue(is_valid_guess(999))
+
+    def test_invalid_even_guesses(self):
+        """Test that even guesses are rejected."""
+        self.assertFalse(is_valid_guess(2))
+        self.assertFalse(is_valid_guess(4))
+        self.assertFalse(is_valid_guess(1000))
+
+    def test_invalid_guesses_below_range(self):
+        """Test that guesses below 1 are rejected."""
+        self.assertFalse(is_valid_guess(0))
+        self.assertFalse(is_valid_guess(-1))
+        self.assertFalse(is_valid_guess(-100))
+
+    def test_invalid_guesses_above_range(self):
+        """Test that guesses above 1000 are rejected."""
+        self.assertFalse(is_valid_guess(1001))
+        self.assertFalse(is_valid_guess(1002))
+        self.assertFalse(is_valid_guess(2000))
+
+    def test_invalid_non_integer_guesses(self):
+        """Test that non-integer guesses are rejected."""
+        self.assertFalse(is_valid_guess(3.5))
+        self.assertFalse(is_valid_guess("5"))
+        self.assertFalse(is_valid_guess(None))
 
 
 if __name__ == '__main__':
