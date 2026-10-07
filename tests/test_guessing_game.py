@@ -1,5 +1,5 @@
 import unittest
-from src.guessing_game import is_valid_target, generate_target, is_valid_guess
+from src.guessing_game import is_valid_target, generate_target, is_valid_guess, compare_guess
 
 
 class TestGuessingGame(unittest.TestCase):
@@ -87,6 +87,25 @@ class TestGuessingGame(unittest.TestCase):
         self.assertFalse(is_valid_guess(3.5))
         self.assertFalse(is_valid_guess("5"))
         self.assertFalse(is_valid_guess(None))
+
+    def test_compare_guess_too_low(self):
+        """Test that compare_guess returns 'too_low' when guess is less than target."""
+        self.assertEqual(compare_guess(3, 5), "too_low")
+        self.assertEqual(compare_guess(1, 999), "too_low")
+        self.assertEqual(compare_guess(101, 501), "too_low")
+
+    def test_compare_guess_too_high(self):
+        """Test that compare_guess returns 'too_high' when guess is greater than target."""
+        self.assertEqual(compare_guess(7, 5), "too_high")
+        self.assertEqual(compare_guess(999, 1), "too_high")
+        self.assertEqual(compare_guess(501, 101), "too_high")
+
+    def test_compare_guess_correct(self):
+        """Test that compare_guess returns 'correct' when guess equals target."""
+        self.assertEqual(compare_guess(5, 5), "correct")
+        self.assertEqual(compare_guess(1, 1), "correct")
+        self.assertEqual(compare_guess(999, 999), "correct")
+        self.assertEqual(compare_guess(501, 501), "correct")
 
 
 if __name__ == '__main__':

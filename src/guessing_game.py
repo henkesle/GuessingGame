@@ -28,3 +28,13 @@ def generate_target():
 def is_valid_guess(value):
     """Check if a player's guess is valid (odd integer between 1 and 1000)."""
     return is_valid_target(value)
+
+
+def compare_guess(guess, target):
+    """Compare a guess to the target and return the result."""
+    if guess < target:
+        return "too_low"
+    elif guess > target:
+        return "too_high"
+    else:
+        return "correct"
