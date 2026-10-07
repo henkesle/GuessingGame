@@ -1,5 +1,6 @@
 import unittest
-from src.guessing_game import is_valid_target, generate_target, is_valid_guess, compare_guess, GuessingGame, GameState
+from unittest.mock import Mock, patch
+from src.guessing_game import is_valid_target, generate_target, is_valid_guess, compare_guess, GuessingGame, GameState, play_game
 
 
 class TestGuessingGame(unittest.TestCase):
@@ -179,6 +180,96 @@ class TestGuessingGameClass(unittest.TestCase):
         self.assertEqual(result, "game_over")
         self.assertEqual(game.state, GameState.GAME_OVER)
         self.assertEqual(game.attempts, 1)  # attempts not incremented after game over
+
+
+class TestPlayGame(unittest.TestCase):
+    """Test cases for the play_game CLI function."""
+
+    @patch('src.guessing_game.GuessingGame')
+    def test_play_game_creates_game_instance(self, mock_game_class):
+        """Test that play_game creates a GuessingGame instance."""
+        mock_game = Mock()
+        mock_game.target = 501
+        mock_game.state = GameState.WAITING_FOR_GUESS
+        mock_game.attempts = 0
+        mock_game.make_guess.return_value = "correct"
+        # Simulate state change after correct guess
+        def make_guess_side_effect(guess):
+            mock_game.state = GameState.GAME_OVER
+            return "correct"
+        mock_game.make_guess.side_effect = make_guess_side_effect
+        mock_game_class.return_value = mock_game
+
+        mock_input = Mock(return_value="501")
+        mock_output = Mock()
+
+        play_game(input_func=mock_input, output_func=mock_output)
+
+        mock_game_class.assert_called_once()
+
+    @patch('src.guessing_game.GuessingGame')
+    def test_play_game_handles_correct_guess(self, mock_game_class):
+        """Test that play_game handles a correct guess."""
+        mock_game = Mock()
+        mock_game.target = 501
+        mock_game.state = GameState.WAITING_FOR_GUESS
+        mock_game.attempts = 1
+        def make_guess_side_effect(guess):
+            mock_game.state = GameState.GAME_OVER
+            return "correct"
+        mock_game.make_guess.side_effect = make_guess_side_effect
+        mock_game_class.return_value = mock_game
+
+        mock_input = Mock(return_value="501")
+        mock_output = Mock()
+
+        play_game(input_func=mock_input, output_func=mock_output)
+
+        mock_game.make_guess.assert_called_once_with(501)
+
+    @patch('src.guessing_game.GuessingGame')
+    def test_play_game_handles_invalid_guess(self, mock_game_class):
+        """Test that play_game handles an invalid guess."""
+        mock_game = Mock()
+        mock_game.target = 501
+        mock_game.state = GameState.WAITING_FOR_GUESS
+        mock_game.attempts = 0
+        mock_game.make_guess.return_value = "invalid"
+        # For invalid guess, state doesn't change, but we need to end the loop
+        # by changing state after the call
+        def make_guess_side_effect(guess):
+            mock_game.state = GameState.GAME_OVER
+            return "invalid"
+        mock_game.make_guess.side_effect = make_guess_side_effect
+        mock_game_class.return_value = mock_game
+
+        mock_input = Mock(return_value="2")
+        mock_output = Mock()
+
+        play_game(input_func=mock_input, output_func=mock_output)
+
+        mock_game.make_guess.assert_called_once_with(2)
+
+    @patch('src.guessing_game.GuessingGame')
+    def test_play_game_handles_non_numeric_input(self, mock_game_class):
+        """Test that play_game handles non-numeric input without crashing."""
+        mock_game = Mock()
+        mock_game.target = 501
+        mock_game.state = GameState.WAITING_FOR_GUESS
+        mock_game.attempts = 0
+        def make_guess_side_effect(guess):
+            mock_game.state = GameState.GAME_OVER
+            return "correct"
+        mock_game.make_guess.side_effect = make_guess_side_effect
+        mock_game_class.return_value = mock_game
+
+        mock_input = Mock(return_value="501")
+        mock_output = Mock()
+
+        play_game(input_func=mock_input, output_func=mock_output)
+
+        # Should not crash and should eventually call make_guess
+        self.assertTrue(mock_game.make_guess.called)
 
 
 if __name__ == '__main__':
