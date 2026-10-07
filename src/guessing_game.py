@@ -38,3 +38,29 @@ def compare_guess(guess, target):
         return "too_high"
     else:
         return "correct"
+
+
+class GuessingGame:
+    """A class that manages a guessing game with a target number."""
+
+    def __init__(self):
+        """Initialize a new game with a random target."""
+        self.target = generate_target()
+        self.is_over = False
+        self.attempts = 0
+
+    def make_guess(self, guess):
+        """Process a player's guess and return the result."""
+        if self.is_over:
+            return "game_over"
+
+        if not is_valid_guess(guess):
+            return "invalid"
+
+        self.attempts += 1
+        result = compare_guess(guess, self.target)
+
+        if result == "correct":
+            self.is_over = True
+
+        return result

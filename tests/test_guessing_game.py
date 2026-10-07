@@ -1,5 +1,5 @@
 import unittest
-from src.guessing_game import is_valid_target, generate_target, is_valid_guess, compare_guess
+from src.guessing_game import is_valid_target, generate_target, is_valid_guess, compare_guess, GuessingGame
 
 
 class TestGuessingGame(unittest.TestCase):
@@ -106,6 +106,76 @@ class TestGuessingGame(unittest.TestCase):
         self.assertEqual(compare_guess(1, 1), "correct")
         self.assertEqual(compare_guess(999, 999), "correct")
         self.assertEqual(compare_guess(501, 501), "correct")
+
+
+class TestGuessingGameClass(unittest.TestCase):
+    """Test cases for the GuessingGame class."""
+
+    def test_game_initialization(self):
+        """Test that a new game creates a valid target and starts in waiting state."""
+        game = GuessingGame()
+        self.assertIsNotNone(game.target)
+        self.assertTrue(is_valid_target(game.target))
+        self.assertFalse(game.is_over)
+        self.assertEqual(game.attempts, 0)
+
+    def test_make_guess_invalid(self):
+        """Test that invalid guess returns 'invalid' and keeps game waiting."""
+        game = GuessingGame()
+        result = game.make_guess(2)  # even number
+        self.assertEqual(result, "invalid")
+        self.assertFalse(game.is_over)
+        self.assertEqual(game.attempts, 0)
+
+    def test_make_guess_too_low(self):
+        """Test that valid low guess returns 'too_low' and keeps game waiting."""
+        game = GuessingGame()
+        # Force a specific target by mocking
+        game.target = 501
+        result = game.make_guess(3)
+        self.assertEqual(result, "too_low")
+        self.assertFalse(game.is_over)
+        self.assertEqual(game.attempts, 1)
+
+    def test_make_guess_too_high(self):
+        """Test that valid high guess returns 'too_high' and keeps game waiting."""
+        game = GuessingGame()
+        game.target = 101
+        result = game.make_guess(999)
+        self.assertEqual(result, "too_high")
+        self.assertFalse(game.is_over)
+        self.assertEqual(game.attempts, 1)
+
+    def test_make_guess_correct(self):
+        """Test that correct guess returns 'correct' and ends the game."""
+        game = GuessingGame()
+        game.target = 501
+        result = game.make_guess(501)
+        self.assertEqual(result, "correct")
+        self.assertTrue(game.is_over)
+        self.assertEqual(game.attempts, 1)
+
+    def test_multiple_guesses_before_correct(self):
+        """Test that multiple guesses are tracked until correct guess."""
+        game = GuessingGame()
+        game.target = 501
+        self.assertEqual(game.make_guess(3), "too_low")
+        self.assertEqual(game.attempts, 1)
+        self.assertEqual(game.make_guess(999), "too_high")
+        self.assertEqual(game.attempts, 2)
+        self.assertEqual(game.make_guess(501), "correct")
+        self.assertTrue(game.is_over)
+        self.assertEqual(game.attempts, 3)
+
+    def test_guess_after_game_over(self):
+        """Test that guesses after game over return 'game_over'."""
+        game = GuessingGame()
+        game.target = 501
+        game.make_guess(501)
+        self.assertTrue(game.is_over)
+        result = game.make_guess(501)
+        self.assertEqual(result, "game_over")
+        self.assertEqual(game.attempts, 1)  # attempts not incremented after game over
 
 
 if __name__ == '__main__':
