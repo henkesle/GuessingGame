@@ -1,4 +1,5 @@
 import random
+from enum import Enum
 
 
 def is_valid_target(value):
@@ -40,18 +41,24 @@ def compare_guess(guess, target):
         return "correct"
 
 
+class GameState(Enum):
+    """Enumeration representing the possible states of the guessing game."""
+    WAITING_FOR_GUESS = 1
+    GAME_OVER = 2
+
+
 class GuessingGame:
     """A class that manages a guessing game with a target number."""
 
     def __init__(self):
         """Initialize a new game with a random target."""
         self.target = generate_target()
-        self.is_over = False
+        self.state = GameState.WAITING_FOR_GUESS
         self.attempts = 0
 
     def make_guess(self, guess):
         """Process a player's guess and return the result."""
-        if self.is_over:
+        if self.state == GameState.GAME_OVER:
             return "game_over"
 
         if not is_valid_guess(guess):
@@ -61,6 +68,6 @@ class GuessingGame:
         result = compare_guess(guess, self.target)
 
         if result == "correct":
-            self.is_over = True
+            self.state = GameState.GAME_OVER
 
         return result
